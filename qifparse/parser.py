@@ -10,6 +10,7 @@ from qifparse.qif import (
     Investment,
     Category,
     Class,
+    Security,
     Qif,
 )
 
@@ -37,7 +38,7 @@ class QifParser(object):
     MONTH_IS_BEFORE_DAY_IN_DATES = False
     # to support 'broken' QIF files that use 2 digit years, and assume 00 and above are >Y2K.  One such
     # exporter is the MacOS Banktivity. When true, apply the Python rule that two digit years < 69 are 20xx
-    PYTHON_Y2K_RULE = False 
+    PYTHON_Y2K_RULE = False
 
     @classmethod
     def parse(cls_, file_handle, date_format=None):
@@ -125,6 +126,8 @@ class QifParser(object):
                 qif_obj.add_category(item)
             elif last_type == 'class':
                 qif_obj.add_class(item)
+            elif last_type == 'security':
+                qif_obj.add_security(item)
         return qif_obj
 
     @classmethod
@@ -147,7 +150,7 @@ class QifParser(object):
     def parseSecurity(cls_, chunk):
         """
         """
-        curItem = Class()
+        curItem = Security()
         lines = chunk.split('\n')
         for line in lines:
             if not len(line) or line[0] == '\n' or \
@@ -155,8 +158,12 @@ class QifParser(object):
                 continue
             elif line[0] == 'N':
                 curItem.name = line[1:]
+            elif line[0] == 'S':
+                curItem.symbol = line[1:]
             elif line[0] == 'T':
-                curItem.account_type = line[1:]
+                curItem.type = line[1:]
+            elif line[0] == 'G':
+                curItem.goal = line[1:]
         return curItem
 
     @classmethod

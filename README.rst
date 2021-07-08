@@ -60,6 +60,13 @@ If you find that your QIF files date format has the month before day (like 12/25
 
 before calling QifParser.parse().
 
+And ff you find that your QIF files date format deals with Y2K incorrectly (uses 00 to mean 2000 instead of 1900) then set
+
+   QifParser.PYTHON_Y2K_RULE = True
+
+before calling QifParser.parse().  This will force the parse to use the Python rules for dealing with 2 digit years.
+
+
 More info
 ============
 For more informations about qif format:

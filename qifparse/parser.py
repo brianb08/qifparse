@@ -35,6 +35,9 @@ class QifParserException(Exception):
 class QifParser(object):
     # to support input formats of month/day/year or day/month/year formats we use a boolean that users can set
     MONTH_IS_BEFORE_DAY_IN_DATES = False
+    # to support 'broken' QIF files that use 2 digit years, and assume 00 and above are >Y2K.  One such
+    # exporter is the MacOS Banktivity. When true, apply the Python rule that two digit years < 69 are 20xx
+    PYTHON_Y2K_RULE = False 
 
     @classmethod
     def parse(cls_, file_handle, date_format=None):
@@ -413,7 +416,7 @@ class QifParser(object):
             except:
                 import pdb; pdb.set_trace()
                 pass
-        if qdate[5] == "'":
+        if qdate[5] == "'" or (cls_.PYTHON_Y2K_RULE and int(qdate[6:8]) < 69):
             C = "20"
         else:
             C = "19"
